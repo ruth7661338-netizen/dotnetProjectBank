@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>BankProject.Core</RootNamespace>
+  </PropertyGroup>
+
+  <!-- חשוב: פרויקט Core לא מפנה לשום פרויקט אחר ולא לחבילות EF Core.
+       זה מבטיח שהמודלים וה-interfaces נשארים נקיים מתלות בתשתית. -->
+
+</Project>

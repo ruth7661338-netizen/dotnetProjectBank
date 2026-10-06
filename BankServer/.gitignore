@@ -1,0 +1,33 @@
+## .NET
+bin/
+obj/
+out/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider / VS Code
+.idea/
+.vscode/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+
+## NuGet
+*.nupkg
+**/packages/*
+
+## User Secrets are stored outside the repo (%APPDATA%/Microsoft/UserSecrets) -
+## this line is a safety net in case a secrets file ever gets created locally by mistake.
+secrets.json
+
+## Logs (NLog output)
+logs/
+
+## Rider/VS temp
+*.DotSettings.user

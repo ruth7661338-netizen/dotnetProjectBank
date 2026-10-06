@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>BankProject.Service</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Service מפנה רק ל-Core לגבי הדומיין. הוא מדבר עם הנתונים דרך IUnitOfWork/interfaces,
+         ולא מכיר BankDbContext או שום provider (SqlServer/PostgreSQL/InMemory) בכלל.
+         חבילת Microsoft.EntityFrameworkCore (ללא provider) נדרשת רק כדי לתפוס את הטיפוס
+         DbUpdateConcurrencyException - זה טיפוס בסיסי, לא תלוי ב-provider ולא מפר את כיוון התלויות. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BankProject.Core\BankProject.Core.csproj" />
+  </ItemGroup>
+
+</Project>
