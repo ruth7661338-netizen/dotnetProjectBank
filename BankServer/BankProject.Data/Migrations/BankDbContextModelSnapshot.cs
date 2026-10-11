@@ -64,7 +64,8 @@ namespace BankProject.Data.Migrations
 
                     b.Property<string>("AccountNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
@@ -80,6 +81,9 @@ namespace BankProject.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountNumber")
+                        .IsUnique();
 
                     b.HasIndex("CustomerId");
 
@@ -125,7 +129,8 @@ namespace BankProject.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -154,11 +159,13 @@ namespace BankProject.Data.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -210,6 +217,88 @@ namespace BankProject.Data.Migrations
                     b.HasIndex("AccountId");
 
                     b.ToTable("Transactions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccountId = 1,
+                            Amount = 8000m,
+                            BalanceAfter = 8000m,
+                            Date = new DateTime(2026, 9, 1, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Note = "יתרת פתיחה",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccountId = 1,
+                            Amount = 5000m,
+                            BalanceAfter = 3000m,
+                            Date = new DateTime(2026, 9, 5, 10, 30, 0, 0, DateTimeKind.Utc),
+                            Note = "העברה לחשבון 1000-0002",
+                            Type = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AccountId = 1,
+                            Amount = 2500m,
+                            BalanceAfter = 5500m,
+                            Date = new DateTime(2026, 9, 10, 8, 15, 0, 0, DateTimeKind.Utc),
+                            Note = "משכורת",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AccountId = 1,
+                            Amount = 500m,
+                            BalanceAfter = 5000m,
+                            Date = new DateTime(2026, 9, 18, 17, 45, 0, 0, DateTimeKind.Utc),
+                            Note = "משיכה מכספומט",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            AccountId = 2,
+                            Amount = 10000m,
+                            BalanceAfter = 10000m,
+                            Date = new DateTime(2026, 9, 1, 9, 5, 0, 0, DateTimeKind.Utc),
+                            Note = "יתרת פתיחה",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 6,
+                            AccountId = 2,
+                            Amount = 5000m,
+                            BalanceAfter = 15000m,
+                            Date = new DateTime(2026, 9, 5, 10, 30, 0, 0, DateTimeKind.Utc),
+                            Note = "העברה מחשבון 1000-0001",
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 7,
+                            AccountId = 3,
+                            Amount = 4000m,
+                            BalanceAfter = 4000m,
+                            Date = new DateTime(2026, 9, 2, 11, 0, 0, 0, DateTimeKind.Utc),
+                            Note = "יתרת פתיחה",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 8,
+                            AccountId = 3,
+                            Amount = 800m,
+                            BalanceAfter = 3200m,
+                            Date = new DateTime(2026, 9, 20, 14, 20, 0, 0, DateTimeKind.Utc),
+                            Note = "תשלום חשבון חשמל",
+                            Type = 1
+                        });
                 });
 
             modelBuilder.Entity("BankProject.Core.Models.User", b =>
@@ -225,11 +314,13 @@ namespace BankProject.Data.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -240,7 +331,9 @@ namespace BankProject.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("CustomerId")
+                        .IsUnique()
+                        .HasFilter("[CustomerId] IS NOT NULL");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -262,6 +355,15 @@ namespace BankProject.Data.Migrations
                             CustomerId = 1,
                             Email = "customer@bank.local",
                             FullName = "ישראל ישראלי",
+                            PasswordHash = "100000.AAECAwQFBgcICQoLDA0ODw==.oWtrAeSs7kbOgbjzpTpGVXeHiOWTIZMNxApazrC9MAk=",
+                            Role = 0
+                        },
+                        new
+                        {
+                            Id = 100,
+                            CustomerId = 2,
+                            Email = "rachel@bank.local",
+                            FullName = "רחל כהן",
                             PasswordHash = "100000.AAECAwQFBgcICQoLDA0ODw==.oWtrAeSs7kbOgbjzpTpGVXeHiOWTIZMNxApazrC9MAk=",
                             Role = 0
                         });
@@ -298,7 +400,7 @@ namespace BankProject.Data.Migrations
                     b.HasOne("BankProject.Core.Models.Account", "Account")
                         .WithMany("Transactions")
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Account");

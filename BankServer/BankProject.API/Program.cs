@@ -92,7 +92,10 @@ try
         });
     });
 
-    builder.Services.AddControllers();
+    // enums נשלחים ומוצגים בשמם (Checking/Savings) במקום כמספרים (0/1) - גם ב-JSON וגם בתפריטים של Swagger
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+            options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(options =>
     {
@@ -118,7 +121,7 @@ try
             Scheme = "Bearer",
             BearerFormat = "JWT",
             In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-            Description = "הדביקי כאן רק את ה-token (בלי המילה Bearer) שהתקבל מ-/api/auth/login"
+            Description = "הדביקי כאן רק את ה-token  שהתקבל מ-/api/auth/login"
         });
         options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
         {
@@ -165,7 +168,8 @@ try
 
     app.Run();
 }
-catch (Exception ex)
+// HostAbortedException נזרקת בכוונה ע"י כלי dotnet ef בזמן design-time - זו לא קריסה אמיתית
+catch (Exception ex) when (ex is not HostAbortedException)
 {
     logger.Error(ex, "השרת נעצר בגלל שגיאה בהפעלה");
     throw;

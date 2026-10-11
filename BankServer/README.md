@@ -43,6 +43,7 @@ Swagger זמין ב-`/swagger` בסביבת פיתוח, כולל כפתור "Aut
 |----------|------------------------|-------------|
 | Clerk    | clerk@bank.local       | Demo1234!   |
 | Customer | customer@bank.local    | Demo1234!   |
+| Customer | rachel@bank.local      | Demo1234!   |
 
 ## בדיקות
 

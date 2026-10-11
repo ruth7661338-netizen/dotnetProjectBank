@@ -41,7 +41,7 @@ dotnet ef migrations add InitialCreate -p BankProject.Data -s BankProject.API
 dotnet ef database update -p BankProject.Data -s BankProject.API
 ```
 
-זה ייצור בפועל את מסד הנתונים `BankProjectDb` על ה-LocalDB שלך, כולל ה-seed data (שני לקוחות, שלושה חשבונות, ושני משתמשי דמו להתחברות).
+זה ייצור בפועל את מסד הנתונים `BankProjectDb` על ה-LocalDB שלך, כולל ה-seed data (שני לקוחות, שלושה חשבונות עם היסטוריית תנועות, ושלושה משתמשי דמו להתחברות).
 
 ## משתמשי דמו (להתחברות דרך `/api/auth/login`)
 
@@ -49,6 +49,7 @@ dotnet ef database update -p BankProject.Data -s BankProject.API
 |----------|-----------------------|-------------|-------------------------------------------|
 | Clerk    | clerk@bank.local      | Demo1234!   | רואה/יוצרת הכל                            |
 | Customer | customer@bank.local   | Demo1234!   | מקושרת ללקוח Id=1 (ישראל ישראלי, חשבונות 1+2) |
+| Customer | rachel@bank.local     | Demo1234!   | מקושרת ללקוח Id=2 (רחל כהן, חשבון 3)          |
 
 ב-Swagger UI, אחרי login, לחצי על כפתור "Authorize" למעלה והדביקי שם רק את ה-token עצמו (בלי המילה "Bearer").
 

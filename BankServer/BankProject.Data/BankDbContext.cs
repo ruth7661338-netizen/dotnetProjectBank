@@ -1,4 +1,4 @@
-using BankProject.Core.Enums;
+﻿using BankProject.Core.Enums;
 using BankProject.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,15 +20,36 @@ public class BankDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Account>()
-            .HasOne(a => a.Customer)
-            .WithMany(c => c.Accounts)
-            .HasForeignKey(a => a.CustomerId);
+        modelBuilder.Entity<Account>(e =>
+        {
+            e.Property(a => a.AccountNumber).HasMaxLength(20);
+            e.HasIndex(a => a.AccountNumber).IsUnique();
+        });
 
         modelBuilder.Entity<Transaction>()
             .HasOne(t => t.Account)
             .WithMany(a => a.Transactions)
-            .HasForeignKey(t => t.AccountId);
+            .HasForeignKey(t => t.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Customer>(e =>
+        {
+            e.Property(c => c.FullName).HasMaxLength(100);
+            e.Property(c => c.Email).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<User>(e =>
+        {
+            e.Property(u => u.FullName).HasMaxLength(100);
+            e.Property(u => u.Email).HasMaxLength(256);
+            e.HasIndex(u => u.CustomerId).IsUnique();   // SQL Server makes this a filtered index (NULLs allowed)
+        });
+
+        modelBuilder.Entity<AccountTag>().Property(t => t.Name).HasMaxLength(50);
+        modelBuilder.Entity<Account>()
+            .HasOne(a => a.Customer)
+            .WithMany(c => c.Accounts)
+            .HasForeignKey(a => a.CustomerId);
 
         modelBuilder.Entity<User>()
             .HasOne(u => u.Customer)
@@ -81,7 +102,27 @@ public class BankDbContext : DbContext
 
         modelBuilder.Entity<User>().HasData(
             new User { Id = 1, FullName = "פקידת בנק", Email = "clerk@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Clerk, CustomerId = null },
-            new User { Id = 2, FullName = "ישראל ישראלי", Email = "customer@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Customer, CustomerId = 1 }
+            new User { Id = 2, FullName = "ישראל ישראלי", Email = "customer@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Customer, CustomerId = 1 },
+            // Id גבוה בכוונה: Ids נמוכים עלולים להיות תפוסים ע"י משתמשים שנרשמו ב-DB מקומי קיים
+            new User { Id = 100, FullName = "רחל כהן", Email = "rachel@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Customer, CustomerId = 2 }
+        );
+
+        // היסטוריית תנועות דמו. ה-BalanceAfter של התנועה האחרונה בכל חשבון שווה ל-Balance שלו למעלה,
+        // ותאריכים קבועים (לא DateTime.UtcNow) כדי ש-HasData יהיה דטרמיניסטי ולא ייצר migration חדש בכל פעם.
+        modelBuilder.Entity<Transaction>().HasData(
+            // חשבון 1 (1000-0001): 8000 -> 3000 -> 5500 -> 5000
+            new Transaction { Id = 1, AccountId = 1, Type = TransactionType.Deposit, Amount = 8000m, BalanceAfter = 8000m, Date = new DateTime(2026, 9, 1, 9, 0, 0, DateTimeKind.Utc), Note = "יתרת פתיחה" },
+            new Transaction { Id = 2, AccountId = 1, Type = TransactionType.TransferOut, Amount = 5000m, BalanceAfter = 3000m, Date = new DateTime(2026, 9, 5, 10, 30, 0, DateTimeKind.Utc), Note = "העברה לחשבון 1000-0002" },
+            new Transaction { Id = 3, AccountId = 1, Type = TransactionType.Deposit, Amount = 2500m, BalanceAfter = 5500m, Date = new DateTime(2026, 9, 10, 8, 15, 0, DateTimeKind.Utc), Note = "משכורת" },
+            new Transaction { Id = 4, AccountId = 1, Type = TransactionType.Withdraw, Amount = 500m, BalanceAfter = 5000m, Date = new DateTime(2026, 9, 18, 17, 45, 0, DateTimeKind.Utc), Note = "משיכה מכספומט" },
+
+            // חשבון 2 (1000-0002): 10000 -> 15000 (צד הקבלה של ההעברה מחשבון 1)
+            new Transaction { Id = 5, AccountId = 2, Type = TransactionType.Deposit, Amount = 10000m, BalanceAfter = 10000m, Date = new DateTime(2026, 9, 1, 9, 5, 0, DateTimeKind.Utc), Note = "יתרת פתיחה" },
+            new Transaction { Id = 6, AccountId = 2, Type = TransactionType.TransferIn, Amount = 5000m, BalanceAfter = 15000m, Date = new DateTime(2026, 9, 5, 10, 30, 0, DateTimeKind.Utc), Note = "העברה מחשבון 1000-0001" },
+
+            // חשבון 3 (2000-0001): 4000 -> 3200
+            new Transaction { Id = 7, AccountId = 3, Type = TransactionType.Deposit, Amount = 4000m, BalanceAfter = 4000m, Date = new DateTime(2026, 9, 2, 11, 0, 0, DateTimeKind.Utc), Note = "יתרת פתיחה" },
+            new Transaction { Id = 8, AccountId = 3, Type = TransactionType.Withdraw, Amount = 800m, BalanceAfter = 3200m, Date = new DateTime(2026, 9, 20, 14, 20, 0, DateTimeKind.Utc), Note = "תשלום חשבון חשמל" }
         );
     }
 
