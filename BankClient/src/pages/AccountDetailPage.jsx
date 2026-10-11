@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
+import { getAccountTypeLabel, getTransactionTypeLabel } from '../utils/labels';
 
 export default function AccountDetailPage() {
   const { id } = useParams();
@@ -33,24 +34,25 @@ export default function AccountDetailPage() {
     load();
   }, [load]);
 
-  if (loading) return <div className="page">טוענת...</div>;
-  if (error) return <div className="page error-banner">{error}</div>;
+  if (loading) return <main className="page-shell text-sm text-slate-500">טוענת...</main>;
+  if (error) return <main className="page-shell"><div className="error-banner">{error}</div></main>;
   if (!account) return null;
 
   return (
-    <div className="page">
-      <p>
-        <Link to="/accounts">&rarr; חזרה לרשימה</Link>
+    <main className="page-shell">
+      <p className="mb-5">
+        <Link className="text-sm font-semibold text-forest hover:underline" to="/accounts">&rarr; חזרה לרשימה</Link>
       </p>
 
-      <div className="card">
-        <h2>חשבון {account.accountNumber}</h2>
-        <p>סוג: {account.type}</p>
-        <p style={{ fontSize: '1.4rem' }}>
-          <strong>{account.balance.toLocaleString()} ₪</strong>
+      <div className="panel mb-6">
+        <p className="text-sm font-semibold text-forest">פרטי חשבון</p>
+        <h2 className="mt-1 text-2xl font-bold text-ink">חשבון {account.accountNumber}</h2>
+        <p className="mt-3 text-sm text-slate-600">סוג: {getAccountTypeLabel(account.type)}</p>
+        <p className="mt-2 text-3xl font-bold text-forest">
+          {account.balance.toLocaleString()} ₪
         </p>
-        <p>לקוח: {account.customerName}</p>
-        <div>
+        <p className="mt-3 text-sm text-slate-600">לקוח: {account.customerName}</p>
+        <div className="mt-3">
           {account.tags?.map((t) => (
             <span className="tag" key={t}>
               {t}
@@ -58,16 +60,17 @@ export default function AccountDetailPage() {
           ))}
         </div>
         <Link to={`/accounts/${id}/action`}>
-          <button style={{ marginTop: 12 }}>הפקדה / משיכה / העברה</button>
+          <button className="primary-button mt-5">הפקדה / משיכה / העברה</button>
         </Link>
       </div>
 
-      <div className="card">
-        <h3>היסטוריית תנועות</h3>
+      <div className="panel">
+        <h3 className="mb-4 text-lg font-bold text-ink">היסטוריית תנועות</h3>
         {transactions.length === 0 ? (
           <p>אין עדיין תנועות בחשבון.</p>
         ) : (
-          <table>
+          <div className="overflow-x-auto">
+          <table className="data-table">
             <thead>
               <tr>
                 <th>תאריך</th>
@@ -81,7 +84,7 @@ export default function AccountDetailPage() {
               {transactions.map((t) => (
                 <tr key={t.id}>
                   <td>{new Date(t.date).toLocaleString('he-IL')}</td>
-                  <td>{t.type}</td>
+                  <td>{getTransactionTypeLabel(t.type)}</td>
                   <td>{t.amount.toLocaleString()} ₪</td>
                   <td>{t.balanceAfter.toLocaleString()} ₪</td>
                   <td>{t.note}</td>
@@ -89,8 +92,9 @@ export default function AccountDetailPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

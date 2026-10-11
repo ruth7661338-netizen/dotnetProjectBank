@@ -66,52 +66,53 @@ export default function MoneyActionPage() {
   }
 
   return (
-    <div className="page">
-      <p>
-        <Link to={`/accounts/${id}`}>&rarr; חזרה לחשבון</Link>
+    <main className="page-shell">
+      <p className="mb-5">
+        <Link className="text-sm font-semibold text-forest hover:underline" to={`/accounts/${id}`}>&rarr; חזרה לחשבון</Link>
       </p>
 
-      <div className="card" style={{ maxWidth: 420 }}>
-        <h2>פעולה על חשבון {id}</h2>
+      <div className="panel w-full max-w-xl">
+        <p className="text-sm font-semibold text-forest">ניהול חשבון</p>
+        <h2 className="mb-6 mt-1 text-2xl font-bold text-ink">פעולה על חשבון {id}</h2>
 
         {conflict && (
           <div className="conflict-banner">
             <strong>הפעולה נכשלה (409 - התנגשות): </strong>
             {conflict}
-            <div style={{ marginTop: 8 }}>
-              <button onClick={handleSubmit} disabled={loading}>
+            <div className="mt-3">
+              <button className="primary-button" onClick={handleSubmit} disabled={loading}>
                 נסי שוב
               </button>
             </div>
           </div>
         )}
         {error && <div className="error-banner">{error}</div>}
-        {success && <div className="card" style={{ background: '#eaf7ea' }}>{success}</div>}
+        {success && <div className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900">{success}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <label>סוג פעולה</label>
-          <select value={action} onChange={(e) => setAction(e.target.value)}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <label className="block text-sm font-medium text-slate-700">סוג פעולה
+          <select className="field" value={action} onChange={(e) => setAction(e.target.value)}>
             {ACTIONS.map((a) => (
               <option key={a.value} value={a.value}>
                 {a.label}
               </option>
             ))}
           </select>
+          </label>
 
           {action === 'Transfer' && (
-            <>
-              <label>מזהה חשבון יעד</label>
-              <input
+            <label className="block text-sm font-medium text-slate-700">מזהה חשבון יעד
+              <input className="field"
                 type="number"
                 value={toAccountId}
                 onChange={(e) => setToAccountId(e.target.value)}
                 required
               />
-            </>
+            </label>
           )}
 
-          <label>סכום</label>
-          <input
+          <label className="block text-sm font-medium text-slate-700">סכום
+          <input className="field"
             type="number"
             step="0.01"
             min="0.01"
@@ -119,15 +120,17 @@ export default function MoneyActionPage() {
             onChange={(e) => setAmount(e.target.value)}
             required
           />
+          </label>
 
-          <label>הערה (אופציונלי)</label>
-          <input value={note} onChange={(e) => setNote(e.target.value)} />
+          <label className="block text-sm font-medium text-slate-700">הערה (אופציונלי)
+          <input className="field" value={note} onChange={(e) => setNote(e.target.value)} />
+          </label>
 
-          <button type="submit" disabled={loading}>
+          <button className="primary-button w-full" type="submit" disabled={loading}>
             {loading ? 'מבצעת...' : 'ביצוע'}
           </button>
         </form>
       </div>
-    </div>
+    </main>
   );
 }

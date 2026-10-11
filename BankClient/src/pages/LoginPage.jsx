@@ -25,26 +25,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="page">
-      <div className="card" style={{ maxWidth: 400, margin: '40px auto' }}>
-        <h2>התחברות</h2>
+    <div className="page-shell flex min-h-[calc(100vh-4rem)] items-start justify-center pt-10 sm:pt-16">
+      <div className="panel w-full max-w-md">
+        <p className="mb-2 text-sm font-semibold text-forest">מערכת הבנק</p>
+        <h2 className="mb-6 text-2xl font-bold text-ink">התחברות</h2>
         {error && <div className="error-banner">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <label>אימייל</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <label className="block text-sm font-medium text-slate-700">אימייל
+          <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
 
-          <label>סיסמה</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <label className="block text-sm font-medium text-slate-700">סיסמה
+          <input className="field" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </label>
 
-          <button type="submit" disabled={loading}>
+          <button className="primary-button w-full" type="submit" disabled={loading}>
             {loading ? 'מתחברת...' : 'התחברות'}
           </button>
         </form>
-        <p style={{ marginTop: 16, fontSize: '0.85rem', color: '#666' }}>
+        <p className="mt-5 rounded-md bg-slate-50 p-3 text-xs leading-5 text-slate-600">
           משתמשי דמו: clerk@bank.local / customer@bank.local, סיסמה Demo1234!
         </p>
-        <p>
-          אין לך חשבון? <Link to="/register">הרשמה</Link>
+        <p className="mt-5 text-sm text-slate-600">
+          אין לך חשבון? <Link className="font-semibold text-forest hover:underline" to="/register">הרשמה</Link>
         </p>
       </div>
     </div>

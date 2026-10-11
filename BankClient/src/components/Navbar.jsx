@@ -11,24 +11,26 @@ export default function Navbar() {
   }
 
   return (
-    <nav>
-      <strong>מערכת הבנק</strong>
+    <nav className="border-b border-emerald-950/10 bg-white shadow-sm">
+      <div className="mx-auto flex min-h-16 w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6 lg:px-8">
+      <strong className="text-lg font-bold text-forest">מערכת הבנק</strong>
       {auth ? (
         <>
-          <Link to="/accounts">{auth.role === 'Clerk' ? 'כל החשבונות' : 'החשבונות שלי'}</Link>
-          <span style={{ marginInlineStart: 'auto' }}>
+          <Link className="text-sm font-semibold text-slate-600 transition hover:text-forest" to="/accounts">{auth.role === 'Clerk' ? 'כל החשבונות' : 'החשבונות שלי'}</Link>
+          <span className="ms-auto text-sm text-slate-600">
             {auth.fullName} ({auth.role === 'Clerk' ? 'פקידה' : 'לקוחה'})
           </span>
-          <button className="secondary" onClick={handleLogout}>
+          <button className="secondary-button" onClick={handleLogout}>
             התנתקות
           </button>
         </>
       ) : (
         <>
-          <Link to="/login">התחברות</Link>
-          <Link to="/register">הרשמה</Link>
+          <Link className="ms-auto text-sm font-semibold text-slate-600 transition hover:text-forest" to="/login">התחברות</Link>
+          <Link className="primary-button text-sm" to="/register">הרשמה</Link>
         </>
       )}
+      </div>
     </nav>
   );
 }
