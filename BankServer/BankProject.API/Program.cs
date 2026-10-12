@@ -5,6 +5,7 @@ using BankProject.Core.Settings;
 using BankProject.Data;
 using BankProject.Data.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
@@ -31,7 +32,9 @@ try
             "Connection string 'Default' לא נמצא. הגדירי אותו ב-User Secrets - ראי הוראות ב-README/SETUP.md.");
 
     builder.Services.AddDbContext<BankDbContext>(options =>
-        options.UseSqlServer(connectionString));
+        // retry על שגיאות חיבור זמניות - נחוץ מול SQL Server בענן (למשל Azure SQL serverless שמתעורר מהשהיה).
+        // בטוח כאן כי אין בקוד טרנזקציות ידניות (BeginTransaction), שאיתן execution strategy מתנגש.
+        options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure()));
 
     // --- Repositories + Unit of Work ---
     builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -150,14 +153,23 @@ try
 
     // --- סדר ה-pipeline חשוב: טיפול בשגיאות קודם כל (תופס הכל שמתחתיו),
     //     CorrelationId אחריו, ו-Authentication לפני Authorization ---
+    // ב-Render (ובכל hosting מאחורי proxy) ה-HTTPS מסתיים ב-proxy, והבקשה מגיעה לאפליקציה כ-HTTP.
+    // הכותרות X-Forwarded-* מחזירות לאפליקציה את הסכמה וה-IP המקוריים, כדי ש-HTTPS redirect יעבוד נכון.
+    // ה-IP של ה-proxy של Render לא קבוע, לכן לא מגבילים ל-KnownProxies/KnownNetworks.
+    var forwardedHeadersOptions = new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    };
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+    app.UseForwardedHeaders(forwardedHeadersOptions);
+
     app.UseMiddleware<ExceptionHandlingMiddleware>();
     app.UseMiddleware<CorrelationIdMiddleware>();
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
-    else
+    // Swagger זמין גם ב-Production (להצגת הפרויקט) - ה-endpoints עצמם עדיין מוגנים ב-JWT
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    if (!app.Environment.IsDevelopment())
     {
         app.UseHttpsRedirection();
     }
@@ -165,6 +177,9 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+
+    // בדיקת חיים ל-Render (Health Check Path) - בלי auth ובלי גישה ל-DB
+    app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
     app.Run();
 }

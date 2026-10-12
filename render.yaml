@@ -1,0 +1,48 @@
+# Render Blueprint - מגדיר את שני השירותים של הפרויקט. הוראות מלאות: DEPLOY.md
+services:
+  # --- API (ASP.NET Core 8 ב-Docker) ---
+  - type: web
+    name: bank-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./BankServer/Dockerfile
+    dockerContext: ./BankServer
+    healthCheckPath: /health
+    # build מחדש רק כשהשרת השתנה, לא על כל שינוי בלקוח
+    buildFilter:
+      paths:
+        - BankServer/**
+    envVars:
+      # connection string ל-SQL Server החיצוני - מוזן ידנית ב-Render, לעולם לא ב-git
+      - key: ConnectionStrings__Default
+        sync: false
+      # מפתח אקראי שנוצר ע"י Render (256 ביט) - מספיק ל-HS256
+      - key: Jwt__SecretKey
+        generateValue: true
+      # כתובת הלקוח המועלה (למשל https://bank-client.onrender.com) - נדרש ל-CORS
+      - key: ClientOrigins__0
+        sync: false
+      # ה-HTTPS מסתיים ב-proxy של Render על 443 - בלי זה UseHttpsRedirection מתריע בכל בקשה
+      - key: ASPNETCORE_HTTPS_PORT
+        value: "443"
+
+  # --- לקוח React (Vite) כאתר סטטי ---
+  - type: web
+    name: bank-client
+    runtime: static
+    rootDir: BankClient
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    buildFilter:
+      paths:
+        - BankClient/**
+    # כל נתיב (למשל /accounts/3) מוחזר ל-index.html כדי ש-React Router יטפל בו
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # כתובת ה-API המועלה (למשל https://bank-api.onrender.com) - נקראת בזמן ה-build
+      - key: VITE_API_BASE_URL
+        sync: false
