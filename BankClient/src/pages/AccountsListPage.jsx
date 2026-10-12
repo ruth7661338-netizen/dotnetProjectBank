@@ -69,7 +69,7 @@ export default function AccountsListPage() {
 
       {!loading && isClerk && pagedResult && (
         <>
-          <div className="overflow-x-auto rounded-lg border border-emerald-950/10 bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-lg border border-brand-dark/10 bg-white shadow-sm">
           <table className="data-table">
             <thead>
               <tr>
@@ -96,7 +96,7 @@ export default function AccountsListPage() {
                     ))}
                   </td>
                   <td>
-                    <Link className="font-semibold text-forest hover:underline" to={`/accounts/${acc.id}`}>פרטים</Link>
+                    <Link className="font-semibold text-brand hover:underline" to={`/accounts/${acc.id}`}>פרטים</Link>
                   </td>
                 </tr>
               ))}
@@ -142,7 +142,7 @@ export default function AccountsListPage() {
               {creating ? 'פותחת...' : 'פתיחת חשבון'}
             </button>
           </form>
-          {createMessage && <p className="mb-4 text-sm font-semibold text-forest">{createMessage}</p>}
+          {createMessage && <p className="mb-4 text-sm font-semibold text-brand">{createMessage}</p>}
 
           {customer.accounts.length === 0 ? (
             <p className="text-sm text-slate-500">אין לך עדיין חשבונות. פתחי חשבון ראשון למעלה.</p>
@@ -164,7 +164,7 @@ export default function AccountsListPage() {
                   <td>{getAccountTypeLabel(acc.type)}</td>
                   <td>{acc.balance.toLocaleString()} ₪</td>
                   <td>
-                    <Link className="font-semibold text-forest hover:underline" to={`/accounts/${acc.id}`}>פרטים</Link>
+                    <Link className="font-semibold text-brand hover:underline" to={`/accounts/${acc.id}`}>פרטים</Link>
                   </td>
                 </tr>
               ))}

@@ -27,7 +27,7 @@ export default function LoginPage() {
   return (
     <div className="page-shell flex min-h-[calc(100vh-4rem)] items-start justify-center pt-10 sm:pt-16">
       <div className="panel w-full max-w-md">
-        <p className="mb-2 text-sm font-semibold text-forest">מערכת הבנק</p>
+        <p className="mb-2 text-sm font-semibold text-brand">מערכת הבנק</p>
         <h2 className="mb-6 text-2xl font-bold text-ink">התחברות</h2>
         {error && <div className="error-banner">{error}</div>}
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -44,7 +44,7 @@ export default function LoginPage() {
           </button>
         </form>
         <p className="mt-5 text-sm text-slate-600">
-          אין לך חשבון? <Link className="font-semibold text-forest hover:underline" to="/register">הרשמה</Link>
+          אין לך חשבון? <Link className="font-semibold text-brand hover:underline" to="/register">הרשמה</Link>
         </p>
       </div>
     </div>

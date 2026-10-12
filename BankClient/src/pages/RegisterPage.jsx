@@ -34,7 +34,7 @@ export default function RegisterPage() {
   return (
     <div className="page-shell flex min-h-[calc(100vh-4rem)] items-start justify-center pt-10 sm:pt-16">
       <div className="panel w-full max-w-md">
-        <p className="mb-2 text-sm font-semibold text-forest">מערכת הבנק</p>
+        <p className="mb-2 text-sm font-semibold text-brand">מערכת הבנק</p>
         <h2 className="mb-3 text-2xl font-bold text-ink">הרשמה</h2>
         <p className="mb-5 text-sm leading-6 text-slate-600">
           הרשמה יוצרת חשבון התחברות בתפקיד לקוחה. פתיחת חשבון בנק בפועל נעשית ע"י פקידה.
@@ -76,7 +76,7 @@ export default function RegisterPage() {
           </button>
         </form>
         <p className="mt-5 text-sm text-slate-600">
-          כבר יש לך חשבון? <Link className="font-semibold text-forest hover:underline" to="/login">התחברות</Link>
+          כבר יש לך חשבון? <Link className="font-semibold text-brand hover:underline" to="/login">התחברות</Link>
         </p>
       </div>
     </div>

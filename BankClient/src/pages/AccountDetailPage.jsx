@@ -41,14 +41,14 @@ export default function AccountDetailPage() {
   return (
     <main className="page-shell">
       <p className="mb-5">
-        <Link className="text-sm font-semibold text-forest hover:underline" to="/accounts">&rarr; חזרה לרשימה</Link>
+        <Link className="text-sm font-semibold text-brand hover:underline" to="/accounts">&rarr; חזרה לרשימה</Link>
       </p>
 
       <div className="panel mb-6">
-        <p className="text-sm font-semibold text-forest">פרטי חשבון</p>
+        <p className="text-sm font-semibold text-brand">פרטי חשבון</p>
         <h2 className="mt-1 text-2xl font-bold text-ink">חשבון {account.accountNumber}</h2>
         <p className="mt-3 text-sm text-slate-600">סוג: {getAccountTypeLabel(account.type)}</p>
-        <p className="mt-2 text-3xl font-bold text-forest">
+        <p className="mt-2 text-3xl font-bold text-brand">
           {account.balance.toLocaleString()} ₪
         </p>
         <p className="mt-3 text-sm text-slate-600">לקוח: {account.customerName}</p>

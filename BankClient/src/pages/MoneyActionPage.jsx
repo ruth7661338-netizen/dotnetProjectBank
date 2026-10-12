@@ -76,11 +76,11 @@ export default function MoneyActionPage() {
   return (
     <main className="page-shell">
       <p className="mb-5">
-        <Link className="text-sm font-semibold text-forest hover:underline" to={`/accounts/${id}`}>&rarr; חזרה לחשבון</Link>
+        <Link className="text-sm font-semibold text-brand hover:underline" to={`/accounts/${id}`}>&rarr; חזרה לחשבון</Link>
       </p>
 
       <div className="panel w-full max-w-xl">
-        <p className="text-sm font-semibold text-forest">ניהול חשבון</p>
+        <p className="text-sm font-semibold text-brand">ניהול חשבון</p>
         <h2 className="mb-6 mt-1 text-2xl font-bold text-ink">פעולה על חשבון {account?.accountNumber ?? ''}</h2>
 
         {conflict && (
