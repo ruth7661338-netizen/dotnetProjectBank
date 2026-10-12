@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { isValidIsraeliId } from '../utils/validation';
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
+  const [idNumber, setIdNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -14,9 +16,13 @@ export default function RegisterPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
+    if (!isValidIsraeliId(idNumber)) {
+      setError('מספר תעודת זהות לא תקין');
+      return;
+    }
     setLoading(true);
     try {
-      await register(fullName, email, password);
+      await register(fullName, idNumber, email, password);
       navigate('/accounts');
     } catch (err) {
       setError(err.message);
@@ -37,6 +43,18 @@ export default function RegisterPage() {
         <form className="space-y-4" onSubmit={handleSubmit}>
           <label className="block text-sm font-medium text-slate-700">שם מלא
           <input className="field" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+          </label>
+
+          <label className="block text-sm font-medium text-slate-700">תעודת זהות (9 ספרות)
+          <input className="field"
+            inputMode="numeric"
+            maxLength={9}
+            pattern="\d{9}"
+            title="9 ספרות, כולל ספרת ביקורת"
+            value={idNumber}
+            onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, ''))}
+            required
+          />
           </label>
 
           <label className="block text-sm font-medium text-slate-700">אימייל

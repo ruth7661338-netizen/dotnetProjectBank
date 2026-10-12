@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import AccountsListPage from './pages/AccountsListPage';
 import AccountDetailPage from './pages/AccountDetailPage';
 import MoneyActionPage from './pages/MoneyActionPage';
+import AddClerkPage from './pages/AddClerkPage';
 
 export default function App() {
   return (
@@ -35,6 +36,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <MoneyActionPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/clerks/new"
+          element={
+            <ProtectedRoute role="Clerk">
+              <AddClerkPage />
             </ProtectedRoute>
           }
         />

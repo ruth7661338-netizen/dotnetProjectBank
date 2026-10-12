@@ -7,4 +7,5 @@ public interface IAuthService
 {
     Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request, CancellationToken ct = default);
     Task<AuthResponseDto> LoginAsync(LoginRequestDto request, CancellationToken ct = default);
+    Task<UserResponseDto> CreateClerkAsync(RegisterRequestDto request, CancellationToken ct = default);
 }

@@ -42,6 +42,8 @@ public class BankDbContext : DbContext
         {
             e.Property(u => u.FullName).HasMaxLength(100);
             e.Property(u => u.Email).HasMaxLength(256);
+            e.Property(u => u.IdNumber).HasMaxLength(9).IsFixedLength();
+            e.HasIndex(u => u.IdNumber).IsUnique();     // filtered index - משתמשים ישנים בלי ת"ז (NULL) לא מתנגשים
             e.HasIndex(u => u.CustomerId).IsUnique();   // SQL Server makes this a filtered index (NULLs allowed)
         });
 
@@ -101,10 +103,10 @@ public class BankDbContext : DbContext
         const string demoPasswordHash = "100000.AAECAwQFBgcICQoLDA0ODw==.oWtrAeSs7kbOgbjzpTpGVXeHiOWTIZMNxApazrC9MAk=";
 
         modelBuilder.Entity<User>().HasData(
-            new User { Id = 1, FullName = "פקידת בנק", Email = "clerk@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Clerk, CustomerId = null },
-            new User { Id = 2, FullName = "ישראל ישראלי", Email = "customer@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Customer, CustomerId = 1 },
+            new User { Id = 1, FullName = "פקידת בנק", IdNumber = "000000018", Email = "clerk@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Clerk, CustomerId = null },
+            new User { Id = 2, FullName = "ישראל ישראלי", IdNumber = "000000026", Email = "customer@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Customer, CustomerId = 1 },
             // Id גבוה בכוונה: Ids נמוכים עלולים להיות תפוסים ע"י משתמשים שנרשמו ב-DB מקומי קיים
-            new User { Id = 100, FullName = "רחל כהן", Email = "rachel@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Customer, CustomerId = 2 }
+            new User { Id = 100, FullName = "רחל כהן", IdNumber = "000000034", Email = "rachel@bank.local", PasswordHash = demoPasswordHash, Role = UserRole.Customer, CustomerId = 2 }
         );
 
         // היסטוריית תנועות דמו. ה-BalanceAfter של התנועה האחרונה בכל חשבון שווה ל-Balance שלו למעלה,

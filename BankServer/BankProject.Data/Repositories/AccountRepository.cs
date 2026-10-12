@@ -51,5 +51,9 @@ public class AccountRepository : IAccountRepository
             .Include(a => a.Tags)
             .FirstOrDefaultAsync(a => a.Id == id, ct);
 
+    // קריאה בלבד - משמש לאיתור חשבון יעד לפי המספר שהמשתמש הקליד
+    public async Task<Account?> GetByAccountNumberAsync(string accountNumber, CancellationToken ct = default) =>
+        await _context.Accounts.AsNoTracking().FirstOrDefaultAsync(a => a.AccountNumber == accountNumber, ct);
+
     public void Add(Account account) => _context.Accounts.Add(account);
 }

@@ -322,6 +322,11 @@ namespace BankProject.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("IdNumber")
+                        .HasMaxLength(9)
+                        .HasColumnType("nchar(9)")
+                        .IsFixedLength();
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -338,6 +343,10 @@ namespace BankProject.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("IdNumber")
+                        .IsUnique()
+                        .HasFilter("[IdNumber] IS NOT NULL");
+
                     b.ToTable("Users");
 
                     b.HasData(
@@ -346,6 +355,7 @@ namespace BankProject.Data.Migrations
                             Id = 1,
                             Email = "clerk@bank.local",
                             FullName = "פקידת בנק",
+                            IdNumber = "000000018",
                             PasswordHash = "100000.AAECAwQFBgcICQoLDA0ODw==.oWtrAeSs7kbOgbjzpTpGVXeHiOWTIZMNxApazrC9MAk=",
                             Role = 1
                         },
@@ -355,6 +365,7 @@ namespace BankProject.Data.Migrations
                             CustomerId = 1,
                             Email = "customer@bank.local",
                             FullName = "ישראל ישראלי",
+                            IdNumber = "000000026",
                             PasswordHash = "100000.AAECAwQFBgcICQoLDA0ODw==.oWtrAeSs7kbOgbjzpTpGVXeHiOWTIZMNxApazrC9MAk=",
                             Role = 0
                         },
@@ -364,6 +375,7 @@ namespace BankProject.Data.Migrations
                             CustomerId = 2,
                             Email = "rachel@bank.local",
                             FullName = "רחל כהן",
+                            IdNumber = "000000034",
                             PasswordHash = "100000.AAECAwQFBgcICQoLDA0ODw==.oWtrAeSs7kbOgbjzpTpGVXeHiOWTIZMNxApazrC9MAk=",
                             Role = 0
                         });

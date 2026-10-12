@@ -18,7 +18,9 @@ async function request(path, { method = 'GET', body, token } = {}) {
   }
 
   if (!res.ok) {
-    const error = new Error(data?.message || `שגיאה בשרת (${res.status})`);
+    // שגיאות ולידציה של ASP.NET (ModelState) מגיעות כ-{ errors: { Field: ["..."] } } ולא כ-message
+    const validationMessages = data?.errors ? Object.values(data.errors).flat() : [];
+    const error = new Error(data?.message || validationMessages.join(' ') || `שגיאה בשרת (${res.status})`);
     error.status = res.status;
     error.data = data;
     throw error;
@@ -31,8 +33,11 @@ export const api = {
   login: (email, password) =>
     request('/api/auth/login', { method: 'POST', body: { email, password } }),
 
-  register: (fullName, email, password) =>
-    request('/api/auth/register', { method: 'POST', body: { fullName, email, password } }),
+  register: (fullName, idNumber, email, password) =>
+    request('/api/auth/register', { method: 'POST', body: { fullName, idNumber, email, password } }),
+
+  // פקידה מוסיפה פקיד/ה נוספ/ת - לא מחזיר token, היוצרת נשארת מחוברת כעצמה
+  createClerk: (token, body) => request('/api/auth/clerks', { method: 'POST', body, token }),
 
   // רשימת כל החשבונות עם pagination אמיתי - פקידות בנק בלבד (Clerk)
   getAccounts: (token, { pageNumber = 1, pageSize = 20 } = {}) =>

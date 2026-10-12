@@ -22,13 +22,11 @@ public class AuthService : IAuthService
 
     /// <summary>
     /// הרשמה יוצרת תמיד משתמש בתפקיד Customer, יחד עם רשומת Customer חדשה המקושרת אליו.
-    /// משתמשי Clerk (פקידי בנק) לא נרשמים בעצמם - הם קיימים רק כ-seed data.
+    /// משתמשי Clerk (פקידי בנק) לא נרשמים בעצמם - פקידה קיימת יוצרת אותם דרך CreateClerkAsync.
     /// </summary>
     public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request, CancellationToken ct = default)
     {
-        var existing = await _unitOfWork.Users.GetByEmailAsync(request.Email, ct);
-        if (existing is not null)
-            throw new InvalidOperationException("כתובת האימייל כבר רשומה במערכת");
+        await EnsureUserAvailableAsync(request, ct);
 
         var customer = new Customer { FullName = request.FullName, Email = request.Email };
         _unitOfWork.Customers.Add(customer);
@@ -37,6 +35,7 @@ public class AuthService : IAuthService
         var user = new User
         {
             FullName = request.FullName,
+            IdNumber = request.IdNumber,
             Email = request.Email,
             PasswordHash = _passwordHasher.Hash(request.Password),
             Role = UserRole.Customer,
@@ -55,6 +54,46 @@ public class AuthService : IAuthService
             throw new AuthenticationFailedException("אימייל או סיסמה שגויים");
 
         return BuildAuthResponse(user);
+    }
+
+    /// <summary>
+    /// פקידה מוסיפה פקיד/ה נוספ/ת. נוצר משתמש Clerk בלבד, בלי רשומת Customer,
+    /// ולא מוחזר token - היוצרת נשארת מחוברת כעצמה.
+    /// </summary>
+    public async Task<UserResponseDto> CreateClerkAsync(RegisterRequestDto request, CancellationToken ct = default)
+    {
+        await EnsureUserAvailableAsync(request, ct);
+
+        var user = new User
+        {
+            FullName = request.FullName,
+            IdNumber = request.IdNumber,
+            Email = request.Email,
+            PasswordHash = _passwordHasher.Hash(request.Password),
+            Role = UserRole.Clerk,
+            CustomerId = null
+        };
+        _unitOfWork.Users.Add(user);
+        await _unitOfWork.SaveChangesAsync(ct);
+
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            Role = user.Role
+        };
+    }
+
+    private async Task EnsureUserAvailableAsync(RegisterRequestDto request, CancellationToken ct)
+    {
+        var existing = await _unitOfWork.Users.GetByEmailAsync(request.Email, ct);
+        if (existing is not null)
+            throw new InvalidOperationException("כתובת האימייל כבר רשומה במערכת");
+
+        var existingId = await _unitOfWork.Users.GetByIdNumberAsync(request.IdNumber, ct);
+        if (existingId is not null)
+            throw new InvalidOperationException("מספר תעודת הזהות כבר רשום במערכת");
     }
 
     private AuthResponseDto BuildAuthResponse(User user)

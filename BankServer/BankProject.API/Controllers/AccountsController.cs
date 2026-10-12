@@ -61,13 +61,27 @@ public class AccountsController : ControllerBase
         return Ok(_mapper.Map<AccountResponseDto>(account));
     }
 
-    /// <summary>יוצר חשבון חדש ללקוח קיים. פקידות בנק בלבד.</summary>
+    /// <summary>
+    /// יוצר חשבון חדש. פקידת בנק יכולה לפתוח חשבון לכל לקוח ועם יתרת פתיחה;
+    /// לקוחה יכולה לפתוח חשבון רק לעצמה, ותמיד ביתרה 0 (כסף נכנס אחר כך דרך הפקדה).
+    /// </summary>
     [HttpPost]
-    [Authorize(Roles = "Clerk")]
     public async Task<IActionResult> Create([FromBody] CreateAccountRequestDto request, CancellationToken ct)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+
+        if (User.GetRole() == UserRole.Customer)
+        {
+            var customerId = User.GetCustomerId();
+            if (customerId is null)
+                return Forbid();
+
+            if (request.OpeningBalance != 0)
+                return BadRequest(new { message = "לקוחה יכולה לפתוח חשבון רק ביתרה 0" });
+
+            request.CustomerId = customerId.Value;
+        }
 
         try
         {
@@ -147,9 +161,13 @@ public class AccountsController : ControllerBase
         if (User.IsForbiddenCustomerAccess(sourceAccount.CustomerId))
             return Forbid();
 
+        var targetAccount = await _bankService.GetAccountByNumberAsync(request.ToAccountNumber, ct);
+        if (targetAccount is null)
+            return BadRequest(new { message = $"חשבון יעד {request.ToAccountNumber} לא נמצא" });
+
         try
         {
-            await _bankService.TransferAsync(id, request.ToAccountId, request.Amount, request.Note, ct);
+            await _bankService.TransferAsync(id, targetAccount.Id, request.Amount, request.Note, ct);
 
             var account = await _bankService.GetAccountAsync(id, ct);
             return Ok(_mapper.Map<AccountResponseDto>(account));

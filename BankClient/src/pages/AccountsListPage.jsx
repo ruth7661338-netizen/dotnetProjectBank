@@ -37,6 +37,30 @@ export default function AccountsListPage() {
     load();
   }, [load]);
 
+  const [newAccountType, setNewAccountType] = useState('Checking');
+  const [creating, setCreating] = useState(false);
+  const [createMessage, setCreateMessage] = useState(null);
+
+  async function handleOpenAccount(e) {
+    e.preventDefault();
+    setCreating(true);
+    setError(null);
+    setCreateMessage(null);
+    try {
+      const account = await api.createAccount(auth.token, {
+        customerId: auth.customerId,
+        type: newAccountType,
+        openingBalance: 0
+      });
+      setCreateMessage(`נפתח חשבון ${getAccountTypeLabel(account.type)} מספר ${account.accountNumber}`);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCreating(false);
+    }
+  }
+
   return (
     <main className="page-shell">
       <h2 className="mb-6 text-2xl font-bold text-ink">{isClerk ? 'כל החשבונות' : 'החשבונות שלי'}</h2>
@@ -101,6 +125,28 @@ export default function AccountsListPage() {
         <div className="panel">
           <h3 className="text-lg font-bold text-ink">{customer.fullName}</h3>
           <p className="mb-5 mt-1 text-sm text-slate-500">{customer.email}</p>
+
+          <form className="mb-6 flex flex-wrap items-end gap-3" onSubmit={handleOpenAccount}>
+            <label className="text-sm font-semibold text-slate-600">
+              פתיחת חשבון חדש
+              <select
+                className="field mt-1"
+                value={newAccountType}
+                onChange={(e) => setNewAccountType(e.target.value)}
+              >
+                <option value="Checking">עובר ושב</option>
+                <option value="Savings">חיסכון</option>
+              </select>
+            </label>
+            <button className="primary-button" type="submit" disabled={creating}>
+              {creating ? 'פותחת...' : 'פתיחת חשבון'}
+            </button>
+          </form>
+          {createMessage && <p className="mb-4 text-sm font-semibold text-forest">{createMessage}</p>}
+
+          {customer.accounts.length === 0 ? (
+            <p className="text-sm text-slate-500">אין לך עדיין חשבונות. פתחי חשבון ראשון למעלה.</p>
+          ) : (
           <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
@@ -125,6 +171,7 @@ export default function AccountsListPage() {
             </tbody>
           </table>
           </div>
+          )}
         </div>
       )}
     </main>

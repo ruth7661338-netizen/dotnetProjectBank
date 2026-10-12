@@ -25,6 +25,9 @@ public class BankService : IBankService
     public Task<Account?> GetAccountAsync(int id, CancellationToken ct = default) =>
         _unitOfWork.Accounts.GetByIdWithCustomerAsync(id, ct);
 
+    public Task<Account?> GetAccountByNumberAsync(string accountNumber, CancellationToken ct = default) =>
+        _unitOfWork.Accounts.GetByAccountNumberAsync(accountNumber.Trim(), ct);
+
     public Task<List<Customer>> GetAllCustomersAsync(CancellationToken ct = default) =>
         _unitOfWork.Customers.GetAllAsync(ct);
 

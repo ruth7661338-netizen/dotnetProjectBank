@@ -35,8 +35,8 @@ export function AuthProvider({ children }) {
   );
 
   const register = useCallback(
-    async (fullName, email, password) => {
-      const result = await api.register(fullName, email, password);
+    async (fullName, idNumber, email, password) => {
+      const result = await api.register(fullName, idNumber, email, password);
       persist(result); // ההרשמה כבר מחזירה token, אז מתחברים ישר
       return result;
     },

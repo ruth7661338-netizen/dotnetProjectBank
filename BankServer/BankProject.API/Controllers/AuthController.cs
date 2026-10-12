@@ -1,6 +1,7 @@
 using BankProject.Core.Dtos.Requests;
 using BankProject.Core.Exceptions;
 using BankProject.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankProject.API.Controllers;
@@ -27,6 +28,25 @@ public class AuthController : ControllerBase
         {
             var result = await _authService.RegisterAsync(request, ct);
             return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>פקידה מוסיפה פקיד/ה נוספ/ת למערכת. לא מחזיר token - היוצרת נשארת מחוברת כעצמה.</summary>
+    [HttpPost("clerks")]
+    [Authorize(Roles = "Clerk")]
+    public async Task<IActionResult> CreateClerk([FromBody] RegisterRequestDto request, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var result = await _authService.CreateClerkAsync(request, ct);
+            return StatusCode(StatusCodes.Status201Created, result);
         }
         catch (InvalidOperationException ex)
         {

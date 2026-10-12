@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('customer@bank.local');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,9 +43,6 @@ export default function LoginPage() {
             {loading ? 'מתחברת...' : 'התחברות'}
           </button>
         </form>
-        <p className="mt-5 rounded-md bg-slate-50 p-3 text-xs leading-5 text-slate-600">
-          משתמשי דמו: clerk@bank.local / customer@bank.local, סיסמה Demo1234!
-        </p>
         <p className="mt-5 text-sm text-slate-600">
           אין לך חשבון? <Link className="font-semibold text-forest hover:underline" to="/register">הרשמה</Link>
         </p>

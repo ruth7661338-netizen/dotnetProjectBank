@@ -17,6 +17,9 @@ export default function Navbar() {
       {auth ? (
         <>
           <Link className="text-sm font-semibold text-slate-600 transition hover:text-forest" to="/accounts">{auth.role === 'Clerk' ? 'כל החשבונות' : 'החשבונות שלי'}</Link>
+          {auth.role === 'Clerk' && (
+            <Link className="text-sm font-semibold text-slate-600 transition hover:text-forest" to="/clerks/new">הוספת פקיד/ה</Link>
+          )}
           <span className="ms-auto text-sm text-slate-600">
             {auth.fullName} ({auth.role === 'Clerk' ? 'פקידה' : 'לקוחה'})
           </span>

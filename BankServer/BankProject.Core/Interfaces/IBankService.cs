@@ -9,6 +9,7 @@ public interface IBankService
     Task<(List<Account> Items, int TotalCount)> GetAllAccountsAsync(
         int pageNumber, int pageSize, AccountType? typeFilter = null, CancellationToken ct = default);
     Task<Account?> GetAccountAsync(int id, CancellationToken ct = default);
+    Task<Account?> GetAccountByNumberAsync(string accountNumber, CancellationToken ct = default);
     Task<List<Customer>> GetAllCustomersAsync(CancellationToken ct = default);
     Task<Customer?> GetCustomerAsync(int id, CancellationToken ct = default);
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
@@ -16,7 +16,15 @@ export default function MoneyActionPage() {
   const [action, setAction] = useState('Deposit');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
-  const [toAccountId, setToAccountId] = useState('');
+  const [toAccountNumber, setToAccountNumber] = useState('');
+  const [account, setAccount] = useState(null);
+
+  // ה-id ב-URL הוא מזהה פנימי - טוענים את החשבון כדי להציג את מספר החשבון המלא
+  useEffect(() => {
+    api.getAccount(auth.token, id)
+      .then(setAccount)
+      .catch((err) => setError(err.message));
+  }, [auth.token, id]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,7 +44,7 @@ export default function MoneyActionPage() {
 
       if (action === 'Transfer') {
         result = await api.transfer(auth.token, id, {
-          toAccountId: Number(toAccountId),
+          toAccountNumber: toAccountNumber.trim(),
           amount: numericAmount,
           note: note || undefined
         });
@@ -51,7 +59,7 @@ export default function MoneyActionPage() {
       setSuccess(`הפעולה בוצעה בהצלחה. יתרה חדשה: ${result.balance.toLocaleString()} ₪`);
       setAmount('');
       setNote('');
-      setToAccountId('');
+      setToAccountNumber('');
     } catch (err) {
       if (err.status === 409) {
         // זה בדיוק המצב של תחרות על המשאב המוגבל - מישהו אחר עדכן את החשבון בין הקריאה לשמירה.
@@ -73,7 +81,7 @@ export default function MoneyActionPage() {
 
       <div className="panel w-full max-w-xl">
         <p className="text-sm font-semibold text-forest">ניהול חשבון</p>
-        <h2 className="mb-6 mt-1 text-2xl font-bold text-ink">פעולה על חשבון {id}</h2>
+        <h2 className="mb-6 mt-1 text-2xl font-bold text-ink">פעולה על חשבון {account?.accountNumber ?? ''}</h2>
 
         {conflict && (
           <div className="conflict-banner">
@@ -101,11 +109,12 @@ export default function MoneyActionPage() {
           </label>
 
           {action === 'Transfer' && (
-            <label className="block text-sm font-medium text-slate-700">מזהה חשבון יעד
+            <label className="block text-sm font-medium text-slate-700">מספר חשבון יעד
               <input className="field"
-                type="number"
-                value={toAccountId}
-                onChange={(e) => setToAccountId(e.target.value)}
+                dir="ltr"
+                placeholder="1000-0002"
+                value={toAccountNumber}
+                onChange={(e) => setToAccountNumber(e.target.value)}
                 required
               />
             </label>
